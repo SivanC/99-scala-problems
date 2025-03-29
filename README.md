@@ -11,7 +11,7 @@ A repository containing my solutions to 99 Scala problems (linked in header).
    approach, difficulty, etc.
 
 ## Impressions
-Stars denote difficulty, from 1-3, as listed in the original problem set
+Stars denote difficulty, from 1 (easiest) to 3 (hardest), as listed in the original problem set
 
 Problems 1-6(\*): Trivial. These will make a good foundation for harder list
 problems. Learned some about exceptions and a lot about testing with MUnit.
