@@ -1,8 +1,10 @@
 package ninety_nine.scala.problems
 
 import scala.annotation.tailrec
+import scala.reflect.classTag
 import java.util.NoSuchElementException
 import java.lang.IndexOutOfBoundsException
+import scala.reflect.ClassTag
 
 /** Holds solutions to [99 Scala problems](https://aperiodic.net/pip/scala/s-99/#p01) */
 object Solution:
@@ -40,3 +42,35 @@ object Solution:
       case head :: tail => gke(tail, acc + 1)
 
     gke(list, 0).head
+
+  /** Problem 4: Returns the number of elements in a list. Returns 0 if list is empty */
+  def listSize[T](list: List[T]): Int =
+    @tailrec
+    def ls(list: List[T], acc: Int): Int = list match
+      case Nil => acc
+      case head :: tail => ls(tail, acc + 1)
+    ls(list, 0)
+
+  /** Problem 5: Reverses a list */
+  def reverseList[T](list: List[T]): List[T] = 
+    @tailrec
+    def rl(list: List[T], acc: List[T]): List[T] = list match
+      case Nil => acc
+      case head :: tail => rl(tail, head :: acc)
+    rl(list, Nil)
+
+  /** Problem 6: Return true if a list is a palindrome, false otherwise */
+  def listIsPalindrome[T](list: List[T]): Boolean = list.size match
+    case 0 => true
+    // don't care about middle element for odd-length lists
+    case s => list.take(s / 2) == reverseList(list.takeRight(s / 2))
+
+  /** Problem 7: Returns a flattened list */
+  def flattenList(list: List[Any]): List[Any] =
+    def fl(list: List[Any]): List[Any] = 
+      list.foldLeft(List.empty[Any]) { (acc, element) => element match
+        case Nil          => acc
+        case head :: tail => fl(head :: tail) ++: acc
+        case item         => item :: acc
+      }
+    reverseList(fl(list))
