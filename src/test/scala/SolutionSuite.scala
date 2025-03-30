@@ -1,9 +1,11 @@
 // For more information on writing tests, see
 // https://scalameta.org/munit/docs/getting-started.html
-import ninety_nine.scala.problems.Solution.*
+import ninety_nine.scala.problems.{ListOps,Duplicates,RunLengthEncoding}
 import scala.reflect.ClassTag
 
-class SolutionSuite extends munit.FunSuite {
+import TestSuite.*
+
+object TestSuite:
   def checkEquals(tests: List[(String, Any, Any)])(using munit.Location): Unit =
     for (name, obtained, expected) <- tests do
       test(name)(assertEquals(obtained, expected))
@@ -14,6 +16,11 @@ class SolutionSuite extends munit.FunSuite {
   def checkFailsWithMessage[T <: Throwable : ClassTag](name: String, message: String)(body: => Any)(using munit.Location): Unit =
     test(name)(interceptMessage[T](message)(body))
 
+class ListOpsSuite extends munit.FunSuite {
+  // get test wrappers
+  import ListOps.*
+
+  // useful vals
   val largeNumber = 1000000
   val intList   = List(1,2,3,4)
   val strList   = List("A", "B", "C", "D")
@@ -99,4 +106,32 @@ class SolutionSuite extends munit.FunSuite {
     ("returns a flattened empty list", flattenList(List(Nil)), Nil)
   )
   checkEquals(flattenListTests)
+}
+
+class DuplicatesSuite extends munit.FunSuite {  
+  import Duplicates.*
+  // useful vals
+  val dupesStrList = List("a", "a", "a", "a", "b", "c", "c", "a", "a", "d", "e", "e", "e", "e")
+  val dupesIntList = List(9, 8, 9, 9, 3, 3, 4, 1, 6, 6)
+  /** removeConsecutiveDuplicates */
+  val dedupedStrList = List("a", "b", "c", "a", "d", "e")
+  val dedupedIntList = List(9, 8, 9, 3, 4, 1, 6)
+  val removeConsecutiveDuplicatesTests = List(
+    ("returns a list of strs without cons. dupes", removeConsecutiveDuplicates(dupesStrList), dedupedStrList),
+    ("returns a list of ints without cons. dupes", removeConsecutiveDuplicates(dupesIntList), dedupedIntList),
+    ("removeConsecutiveDuplicates works on empty list", removeConsecutiveDuplicates(Nil), Nil),
+  )
+  checkEquals(removeConsecutiveDuplicatesTests)
+
+  /** packConsecutiveDuplicates */
+  val packedStrList = 
+    List(List("a", "a", "a", "a"), List("b"), List("c", "c"), 
+    List("a", "a"), List("d"), List("e", "e", "e", "e"))
+  val packedIntList = List(List(9), List(8), List(9, 9), List(3, 3), List(4), List(1), List(6, 6))
+  val packConsecutiveDuplicatesTests = List(
+    ("returns a packed str list", packConsecutiveDuplicates(dupesStrList), packedStrList),
+    ("returns a packed int list", packConsecutiveDuplicates(dupesIntList), packedIntList),
+    ("returns a packed empty list", packConsecutiveDuplicates(Nil), Nil)
+  )
+  checkEquals(packConsecutiveDuplicatesTests)
 }

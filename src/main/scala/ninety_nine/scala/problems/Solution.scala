@@ -6,8 +6,8 @@ import java.util.NoSuchElementException
 import java.lang.IndexOutOfBoundsException
 import scala.reflect.ClassTag
 
-/** Holds solutions to [99 Scala problems](https://aperiodic.net/pip/scala/s-99/#p01) */
-object Solution:
+/** Solutions related to abstract manipulation of lists */
+object ListOps:
   /** Problem 1: Returns the last element of a list. Errors if given empty list */
   def getLastElement[T](list: List[T]): T =
     @tailrec
@@ -74,3 +74,29 @@ object Solution:
         case item         => item :: acc
       }
     reverseList(fl(list))
+
+/** Solutions related to duplicate elements in lists */
+object Duplicates:
+  import ListOps.*
+  /** Problem 8: Returns a list without consecutive duplicates */
+  def removeConsecutiveDuplicates[T](list: List[T]): List[T] =
+    @tailrec
+    def rcd(list: List[T], acc: List[T]): List[T] = list match
+      case Nil          => acc
+      case head :: Nil  => head :: acc
+      case head :: tail => tail.head match
+        case h1 if head == h1 => rcd(tail, acc) // current head matches next element
+        case _                => rcd(tail, head :: acc) // current head is diff than next
+    reverseList(rcd(list, Nil))
+
+  /** packConsecutiveDuplicates */
+  def packConsecutiveDuplicates[T](list: List[T]): List[List[T]] =
+    @tailrec
+    def pcd(list: List[T], smallAcc: List[T], acc: List[List[T]]): List[List[T]] = list match
+      case Nil => acc
+      case head :: tail if listSize(smallAcc) == 0 || smallAcc.head == head => // Nil or in a run
+        pcd(tail, head :: smallAcc, acc)
+      case head :: tail => pcd(tail, head :: Nil, smallAcc :: acc) // new run
+    reverseList(pcd(list, Nil, Nil))
+
+object RunLengthEncoding
