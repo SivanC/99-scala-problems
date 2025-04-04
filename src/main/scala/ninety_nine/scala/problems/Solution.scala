@@ -89,14 +89,61 @@ object Duplicates:
         case _                => rcd(tail, head :: acc) // current head is diff than next
     reverseList(rcd(list, Nil))
 
-  /** packConsecutiveDuplicates */
+  /** Problem 9: Packs consecutive duplicates in a list into nested lists */
   def packConsecutiveDuplicates[T](list: List[T]): List[List[T]] =
     @tailrec
     def pcd(list: List[T], smallAcc: List[T], acc: List[List[T]]): List[List[T]] = list match
-      case Nil => acc
+      case Nil => if smallAcc.size > 0 then smallAcc :: acc else acc
       case head :: tail if listSize(smallAcc) == 0 || smallAcc.head == head => // Nil or in a run
         pcd(tail, head :: smallAcc, acc)
       case head :: tail => pcd(tail, head :: Nil, smallAcc :: acc) // new run
     reverseList(pcd(list, Nil, Nil))
 
-object RunLengthEncoding
+object RunLengthEncoding:
+  import ListOps.*
+  import Duplicates.*
+  /** Problem 10: Uses packConsecutiveDuplicates to implement run-length
+   *  encoding. Consecutive duplicates of elements are encoded as tuples (N, E)
+   *  where N is the number of duplicates of the element E. 
+   */
+  def encodeRunLength[T](list: List[T]): List[(Int, T)] =
+    val packedList: List[List[T]] = packConsecutiveDuplicates(list)
+    packedList.map{ elem => 
+      (listSize(elem), getKthElement(elem, 0))
+    }
+
+  /** Problem 11: Uses packConsecutiveDuplicates to implement run-length
+   *  encoding. Differs from [[encodeRunLength]] in that runs of length 1 are
+   *  encoded directly and not as a list
+   */
+  def encodeModifiedRunLength[T](list: List[T]): List[(Int, T) | T] =
+    val packedList: List[List[T]] = packConsecutiveDuplicates(list)
+    packedList.map{ elem => listSize(elem) match
+      case 1 => elem.head
+      case _ => (listSize(elem), getKthElement(elem, 0))
+    }
+
+  /** Problem 12: Decodes a run-length encoded list that encodes single-length
+   *  runs in lists.
+   */
+  def decodeEncodedList[T](list: List[(Int, T)]): List[T] =
+    @tailrec
+    def dl(list: List[(Int, T)], acc: List[T]): List[T] = list match
+      case Nil          => acc
+      case head :: tail => dl(tail,
+        (for i <- 0 until head.head yield head.last).toList ++: acc) // build decoded run
+    reverseList(dl(list, Nil))
+
+  /** Problem 13: Encodes a list with run-length encoding directly (no helper
+   *  methods from the package)
+   */
+  def directEncodeRunLength[T](list: List[T]): List[(Int, T)] = 
+    if list.size == 0 then return Nil // guard so we can pass "default" value for current run element of type T
+    @tailrec
+    def derl(list: List[T], run: (Int, T), acc: List[(Int, T)]): List[(Int, T)] = list match
+      case Nil => run :: acc // end
+      case head :: tail if run.head == 0 || run.last == head => // first run or continue
+        derl(tail, (run.head + 1, head), acc)
+      case head :: tail => 
+        derl(tail, (1, head), run :: acc) // new non-first run
+    reverseList(derl(list, (0, list.head), Nil)) // use head of list as filler value since it has to be of type T

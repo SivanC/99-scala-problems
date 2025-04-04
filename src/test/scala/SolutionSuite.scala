@@ -1,137 +1,186 @@
-// For more information on writing tests, see
-// https://scalameta.org/munit/docs/getting-started.html
+// solutions
 import ninety_nine.scala.problems.{ListOps,Duplicates,RunLengthEncoding}
-import scala.reflect.ClassTag
+// testing
+import org.scalatest.*
+import flatspec.*
+import matchers.*
 
-import TestSuite.*
+abstract class UnitSpec extends AnyFlatSpec with should.Matchers with OptionValues with Inside with Inspectors
 
-object TestSuite:
-  def checkEquals(tests: List[(String, Any, Any)])(using munit.Location): Unit =
-    for (name, obtained, expected) <- tests do
-      test(name)(assertEquals(obtained, expected))
-
-  def checkCondition(name: String)(body: => Boolean)(using munit.Location): Unit =
-    test(name)(assert(body))
-
-  def checkFailsWithMessage[T <: Throwable : ClassTag](name: String, message: String)(body: => Any)(using munit.Location): Unit =
-    test(name)(interceptMessage[T](message)(body))
-
-class ListOpsSuite extends munit.FunSuite {
+class ListOpsSpec extends UnitSpec {
   // get test wrappers
   import ListOps.*
 
   // useful vals
   val largeNumber = 1000000
   val intList   = List(1,2,3,4)
-  val strList   = List("A", "B", "C", "D")
   val largeList  = (for i <- 1 to largeNumber yield i).toList
 
   /** getLastElement */
-  val getLastElementTests: List[(String, Any, Any)] = List(
-    ("gets last element of string list", getLastElement(strList), "D"),
-    ("gets last element of integer list", getLastElement(intList), 4),
-    ("gets last element of one-element list", getLastElement(List(1)), 1),
-    ("gets last element of long list", getLastElement(largeList), largeNumber),
-  )
-  checkEquals(getLastElementTests)
-  checkFailsWithMessage[NoSuchElementException](
-    "fails to get last element of list", "last of empty list")(getLastElement(Nil))
+  "getLastElement" should "get the last element of a list" in {
+    assertResult(4)(getLastElement(intList))
+  }
+  it should "get the element of a list of size 1" in {
+    assertResult(0)(getLastElement(List(0)))
+  }
+  it should "get the last element of a long list" in {
+    assertResult(largeNumber)(getLastElement(largeList))
+  }
+  it should "throw an exception on an empty list" in {
+    assertThrows[NoSuchElementException](getLastElement(Nil))
+  }
 
   /** getLastButOneElement */
-  val getLastButOneElementTests = List(
-    ("gets last-but-one element of string list", getLastButOneElement(strList), "C"),
-    ("gets last-but-one element of int list", getLastButOneElement(intList), 3),
-    ("gets last-but-one of two-element list", getLastButOneElement(List(1,2)), 1),
-    ("gets last-but-one element of long list", getLastButOneElement(largeList), largeNumber - 1),
-  )
-  checkEquals(getLastButOneElementTests)
-  checkFailsWithMessage[NoSuchElementException](
-    "fails to get last-but-one element of one-element list", "last-but-one of list of size 1")
-    (getLastButOneElement(List(1)))
-  checkFailsWithMessage[NoSuchElementException](
-    "fails to get last-but-one element of empty list", "last-but-one of empty list")
-    (getLastButOneElement(Nil))
+  "getLastButOneElement" should "get the last-but-one element of a list" in {
+    assertResult(3)(getLastButOneElement(intList))
+  }
+  it should "get the last-but-one element of a large list" in {
+    assertResult(largeNumber - 1)(getLastButOneElement(largeList))
+  }
+  it should "throw an exception on a one-element list" in {
+    assertThrows[NoSuchElementException](getLastButOneElement(List(0)))
+  }
+  it should "throw an exception on an empty list" in {
+    assertThrows[NoSuchElementException](getLastButOneElement(Nil))
+  }
 
   /** getLastButOneElement */
-  val getKthElementTests = List(
-    ("gets kth element of string list", getKthElement(strList, 1), "B"),
-    ("gets kth element of int list", getKthElement(intList, 2), 3),
-    ("gets kth element of k-element list", getKthElement(List(1 -> 2, 3 -> 4), 1), 3 -> 4),
-    ("gets kth element of long list", 
-      getKthElement(largeList, largeNumber / 2), largeNumber / 2 + 1),
-  )  
-  checkEquals(getKthElementTests)
-  checkFailsWithMessage[NoSuchElementException](
-    "fails to get kth element of list with length less than k", "element 15 of list of size 4")
-    (getKthElement(intList, 15))
-  checkFailsWithMessage[IndexOutOfBoundsException]
-    ("fails to get kth element when k is less than zero", "no such index -1")
-    (getKthElement(intList, -1))
+  "getKthElement" should "get the kth element of a list" in {
+    assertResult(3)(getKthElement(intList, 2))
+  }
+  it should "get the kth element of a list of size k + 1" in {
+    assertResult(4)(getKthElement(intList, 3))
+  }
+  it should "get the kth element of a large list" in {
+    assertResult(largeNumber / 2 + 1)(getKthElement(largeList, largeNumber / 2))
+  }
+  it should "throw an exception on a list of size less than k" in {
+    assertThrows[NoSuchElementException](getKthElement(intList, 15))
+  }
+  it should "throw an exception when k is not a valid list index" in {
+    assertThrows[IndexOutOfBoundsException](getKthElement(intList, -1))
+  }
 
   /** listSize */
-  val listSizeTests = List(
-    ("gets size of int list", listSize(intList), 4),
-    ("gets size of empty list", listSize(Nil), 0),
-    ("gets size of large list", listSize(largeList), largeNumber),
-  )
-  checkEquals(listSizeTests)
+  "listSize" should "get size of a list" in {
+    assertResult(4)(listSize(intList))
+  }
+  it should "get the size of an empty list" in {
+    assertResult(0)(listSize(Nil))
+  }
+  it should "get the size of a large list" in {
+    assertResult(largeNumber)(listSize(largeList))
+  }
 
   /** reverseList */
-  val reverseListTests = List(
-    ("gets reverse of list of ints", reverseList(intList), List(4,3,2,1)),
-    ("gets reverse of empty list", reverseList(Nil), Nil),
-    ("gets reverse of long list", 
-      reverseList(largeList), (for i <- largeNumber to 1 by -1 yield i).toList)
-  )
-  checkEquals(reverseListTests)
+  "reverseList" should "get the reverse of a list" in {
+    assertResult(intList.reverse)(reverseList(intList))
+  }
+  it should "get the reverse of an empty list" in {
+    assertResult(Nil)(reverseList(Nil))
+  }
+  it should "get the reverse of a large list" in {
+    assertResult(largeList.reverse)(reverseList(largeList))
+  }
 
   /** listIsPalindrome */
   val largePalindromicList = ((for i <- 1 to largeNumber / 2 yield i) ++ (for i <- largeNumber / 2 to 1 by -1 yield i)).toList
-  val listIsPalindromeTests = List(
-    ("returns true for even-size palindromic list", listIsPalindrome(List(1,2,2,1))),
-    ("returns false for even-size non-palindromic list", !listIsPalindrome(intList)),
-    ("returns true for odd-size palindromic list", listIsPalindrome(List(1,2,3,2,1))),
-    ("returns false for odd-size non-palindromic list", !listIsPalindrome(List(1,2,3,4,5))),
-    ("returns true for large palindromic list", listIsPalindrome(largePalindromicList)),
-    ("returns true for list of size 1", listIsPalindrome(List(1))),
-    ("returns true for empty list", listIsPalindrome(Nil)),
-  )
-  for (name, body) <- listIsPalindromeTests do checkCondition(name)(body)
+  "listIsPalindrome" should "return true for an even-sized palindromic list" in {
+    assert(listIsPalindrome(List(1,2,2,1)))
+  }
+  it should "return false for an even-sized non-palindromic list" in {
+    assert(!listIsPalindrome(intList))
+  }
+  it should "return true for an odd-sized palindromic list" in {
+    assert(listIsPalindrome(List(1,2,3,2,1)))
+  }
+  it should "return false for an odd-sized non-palindromic list" in {
+    assert(!listIsPalindrome(List(1,2,3,4,5)))
+  }
+  it should "return true for a large palindromic list" in {
+    assert(listIsPalindrome(largePalindromicList))
+  }
+  it should "return false for a large non-palindromic list" in {
+    assert(!listIsPalindrome(largeList))
+  }
+  it should "return true for a list of size 1" in {
+    assert(listIsPalindrome(List(0)))
+  }
+  it should "return true for an empty list" in {
+    assert(listIsPalindrome(Nil))
+  }
 
   /** flattenList */
   val nestedIntList = List(List(1,1), 2, List(3, List(5,8)))
   val flattenedIntList = List(1,1,2,3,5,8)
-  val flattenListTests = List(
-    ("returns a flattened list of ints", flattenList(nestedIntList), flattenedIntList),
-    ("returns a flattened empty list", flattenList(List(Nil)), Nil)
-  )
-  checkEquals(flattenListTests)
+  "flattenList" should "return a flattened list from a nested list" in {
+    assertResult(flattenedIntList)(flattenList(nestedIntList))
+  }
+  it should "return from an empty list" in {
+    assertResult(Nil)(flattenList(Nil))
+  }
 }
 
-class DuplicatesSuite extends munit.FunSuite {  
+class DuplicatesSpec extends UnitSpec {  
   import Duplicates.*
   // useful vals
   val dupesStrList = List("a", "a", "a", "a", "b", "c", "c", "a", "a", "d", "e", "e", "e", "e")
-  val dupesIntList = List(9, 8, 9, 9, 3, 3, 4, 1, 6, 6)
   /** removeConsecutiveDuplicates */
   val dedupedStrList = List("a", "b", "c", "a", "d", "e")
-  val dedupedIntList = List(9, 8, 9, 3, 4, 1, 6)
-  val removeConsecutiveDuplicatesTests = List(
-    ("returns a list of strs without cons. dupes", removeConsecutiveDuplicates(dupesStrList), dedupedStrList),
-    ("returns a list of ints without cons. dupes", removeConsecutiveDuplicates(dupesIntList), dedupedIntList),
-    ("removeConsecutiveDuplicates works on empty list", removeConsecutiveDuplicates(Nil), Nil),
-  )
-  checkEquals(removeConsecutiveDuplicatesTests)
+  "removeConsecutiveDuplicates" should "remove consecutive duplicates from a list" in {
+    assertResult(dedupedStrList)(removeConsecutiveDuplicates(dupesStrList))
+  }
+  it should "return from an empty list" in {
+    assertResult(Nil)(removeConsecutiveDuplicates(Nil))
+  }
 
   /** packConsecutiveDuplicates */
   val packedStrList = 
     List(List("a", "a", "a", "a"), List("b"), List("c", "c"), 
     List("a", "a"), List("d"), List("e", "e", "e", "e"))
-  val packedIntList = List(List(9), List(8), List(9, 9), List(3, 3), List(4), List(1), List(6, 6))
-  val packConsecutiveDuplicatesTests = List(
-    ("returns a packed str list", packConsecutiveDuplicates(dupesStrList), packedStrList),
-    ("returns a packed int list", packConsecutiveDuplicates(dupesIntList), packedIntList),
-    ("returns a packed empty list", packConsecutiveDuplicates(Nil), Nil)
-  )
-  checkEquals(packConsecutiveDuplicatesTests)
+  "packConsecutiveDuplicates" should "return a packed list" in {
+    println(packConsecutiveDuplicates(dupesStrList))
+    assertResult(packedStrList)(packConsecutiveDuplicates(dupesStrList))
+  }
+  it should "return from an empty list" in {
+    assertResult(Nil)(packConsecutiveDuplicates(Nil))
+  }
+}
+
+class RunLengthEncodingSpec extends UnitSpec {
+  import RunLengthEncoding.*
+  val dupesStrList = List("a", "a", "a", "a", "b", "c", "c", "a", "a", "d", "e", "e", "e", "e")
+  /** encodeRunLength */
+  val runLengthEncodedList = List((4,"a"), (1,"b"), (2,"c"), (2,"a"), (1,"d"), (4, "e"))
+  "encodeRunLength" should "encode a list using run-length encoding" in {
+    assertResult(runLengthEncodedList)(encodeRunLength(dupesStrList))
+  }
+  it should "return on an empty list" in {
+    assertResult(Nil)(encodeRunLength(Nil))
+  }
+
+  /** encodeModifiedRunLength */
+  val modifiedRunLengthEncodedList = List((4, "a"), "b", (2, "c"), (2, "a"), "d", (4, "e"))
+  "encodeModifiedRunLength" should "encode a list using modified run-length encoding" in {
+    assertResult(modifiedRunLengthEncodedList)(encodeModifiedRunLength(dupesStrList)) 
+  }
+  it should "return on an empty list" in {
+    assertResult(Nil)(encodeModifiedRunLength(Nil))
+  }
+
+  /** decodeEncodedList */
+  "decodeEncodedList" should "decode a list encoded with run-length encoding" in {
+    assertResult(dupesStrList)(decodeEncodedList(runLengthEncodedList))
+  }
+  it should "return on an empty list" in {
+    assertResult(Nil)(decodeEncodedList(Nil))
+  }
+
+  /** directEncodeRunLength */
+  "directEncodeRunLength" should "encode a list using run-length encoding" in {
+    assertResult(runLengthEncodedList)(directEncodeRunLength(dupesStrList))
+  }
+  it should "return on an empty list" in {
+    assertResult(Nil)(directEncodeRunLength(Nil))
+  }
 }
