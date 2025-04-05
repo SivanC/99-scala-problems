@@ -117,6 +117,37 @@ object ListOps:
       val (first, last) = splitByLength(list.size + n, list) // add because n is negative
       last ++: first
 
+  /** Problem 20: Removes the [k]th element from a list */
+  def removeKthElement[T](k: Int, list: List[T]): (List[T], Option[T]) =
+    @tailrec
+    def rke(c: Int, list: List[T], acc: List[T]): (List[T], Option[T]) = list match
+      case Nil => (reverseList(acc), None)
+      case head :: tail if c == k => (reverseList(acc) ++: tail, Some(head)) // exit early if match
+      case head :: tail => rke(c + 1, tail, head :: acc)
+    rke(0, list, Nil)
+
+  /** Problem 21: Inserts an element at position [k] in a list */
+  def insertAt[T](k: Int, elem: T, list: List[T]): List[T] = 
+    @tailrec
+    def ia(c: Int, list: List[T], acc: List[T]): List[T] = list match
+      case Nil if c == k => elem :: acc // insert at end
+      case Nil => acc
+      case head :: tail if c == k => ia(c + 1, tail, head :: elem :: acc)
+      case head :: tail => ia(c + 1, tail, head :: acc)
+    reverseList(ia(0, list, Nil))
+
+  /** Problem 22: Creates a range of integers */
+  def listRange(bound1: Int, bound2: Int, step: Int = 1): List[Int] =
+    // check for unreachable second bound
+    if (bound1 < bound2 && step <= 0) ||
+       (bound2 < bound1 && step >= 0) then List(bound1)
+    val between = (a: Int, b: Int, c: Int) => (a <= b && b <= c) || (c <= b && b <= a)
+    @tailrec
+    def lr(c: Int, acc: List[Int]): List[Int] = c match
+      case n if between(bound1, n, bound2) => lr(c + step, n :: acc)
+      case _ => acc
+    reverseList(lr(bound1, Nil))
+
 /** Solutions related to duplicate elements in lists */
 object Duplicates:
   import ListOps.*
@@ -213,3 +244,24 @@ object RunLengthEncoding:
         derl(tail, (1, head), run :: acc) // new non-first run
     reverseList(derl(list, (0, list.head), Nil)) // use head of list as filler value since it has to be of type T
 
+
+object ListRandom:
+  import ListOps.*
+  import util.Random
+
+  // generators
+  given seededRng: Random = Random(99) 
+  given rng: Random = Random()
+
+  /** Problem 23: Extracts [n] random element from a list */
+  def extractRandomFromList[T](n: Int, list: List[T])(using r: Random): List[T] = 
+    @tailrec
+    def erfl(c: Int, list: List[T], acc: List[T]): List[T] = list match
+      case Nil => acc
+      case head :: tail if c == n => acc
+      case l: List[T] => 
+        val (remained, removed) = removeKthElement(r.between(0, l.size), l)
+        removed match
+          case Some(rem) => erfl(c + 1, remained, rem :: acc)
+          case None => acc // shouldn't happen because list is non-Nil
+    erfl(0, list, Nil)

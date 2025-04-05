@@ -42,7 +42,10 @@ recursion very well.
 Problem 13(\*\*): This one was more challenging than I expected, and I spent a
 lot of time mapping out the different recursion conditions. To my surprise, I
 was able to write it with only 1 variable tracking both the length and character
-of the run, and also make the function tail recursive.
+of the run, and also make the function tail recursive. Really hate (this came up
+again in Problem 20) that you have to make a default value for the first call of
+the recursive function. Would use options but it's so clunky for so little
+benefit.
 
 Problems 14/15(\*, \*\*): Not sure why 15 is two stars, both easily handled with
 the usual tail recursion strategy so far.
@@ -63,7 +66,32 @@ the unaware.
 
 Problem 19(\*\*): Finally a non-tail recursion problem (well, indirectly it
 was). Glad to be able to use a previous method for an easy solution. I like that
-they had me implement negative numbers as well.
+they had me implement negative numbers as well. 
+
+Problem 20(\*): Straightforward, but reminded me to make sure that either all my
+reverses are happening in the case structure or outside of it. Looking ahead,
+you could theoretically use a common helper for this and 21 that transforms the
+nth element of a list with some operation (`=> Nil`, `=> newElem ::
+currentElem`, etc.). **EDIT**: Just realized I'm supposed to include the removed
+value as a tuple. I really don't like this because it forces you to either use
+Options which can be clunky or to provide some sort of default value, in the
+case that the index to remove is not valid. 
+
+Problem 21(\*): Harder than I thought it might be, in accounting for inserts at
+the end of (empty) lists. Fun to consider multiple Nil cases. I'm always trying
+to shift more towards TDD in writing the test "shoulds", then the definition, then
+the assert statements, then the actual body. `???` is very helpful.
+
+Problem 22(\*): This felt more like 2 stars, since I decided to expand the
+function to include an optional step parameter and therefore reverse ranges.
+Another extension problem could be to implement the method for all numeric
+types, although I'm not skilled enough at the type system and givens to do that
+quite yet.
+
+Problem 23(\*\*): Not sure why this is two stars, especially with the method we
+wrote in Problem 20 provided. The testing was the hardest part of this, and I
+will probably go back and change my method later. This does seem like a good
+place for context parameters and using clauses, though.
 
 ## Bonus: Testing Library
 At first, I used MUnit for my testing, as that was the library that was

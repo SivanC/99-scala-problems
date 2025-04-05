@@ -1,5 +1,5 @@
 // solutions
-import ninety_nine.scala.problems.{ListOps,Duplicates,RunLengthEncoding}
+import ninety_nine.scala.problems.{ListOps,Duplicates,RunLengthEncoding,ListRandom}
 // testing
 import org.scalatest.*
 import flatspec.*
@@ -142,6 +142,7 @@ class ListOpsSpec extends UnitSpec {
   /** splitByLength */
   val splitList = (List(1,2), List(3,4))
   val intListAndNil = (intList, Nil)
+  val twiceNil = (Nil, Nil)
   "splitByLength" should "split a list into two parts, with the first of length len" in {
     assertResult(splitList)(splitByLength(2, intList))
   }
@@ -151,7 +152,7 @@ class ListOpsSpec extends UnitSpec {
     assertResult(intListAndNil)(splitByLength(-1, intList))
   }
   it should "return a pair of empty lists if the list is empty" in {
-    assertResult((Nil, Nil))(splitByLength(1, Nil))
+    assertResult(twiceNil)(splitByLength(1, Nil))
   }
 
   /** getSlice */
@@ -187,6 +188,57 @@ class ListOpsSpec extends UnitSpec {
   }
   it should "return on an empty list" in {
     assertResult(Nil)(rotateLeft(1, Nil))
+  }
+
+  /** removeKthElement */
+  val removeThirdIntList = List(1,2,4)
+  "removeKthElement" should "remove the kth element from a list" in {
+    assertResult((removeThirdIntList, Some(3)))(removeKthElement(2, intList)) // zero-indexed
+  }
+  it should "return the original list if k is not a valid index" in {
+    assertResult((intList, None))(removeKthElement(100, intList))
+    assertResult((intList, None))(removeKthElement(-1, intList))
+  }
+  it should "return on an empty list" in {
+    assertResult((Nil, None))(removeKthElement(1, Nil))
+  }
+
+  /** insertAt */
+  val insertedIntList = List(1, 2, 5, 3, 4)
+  "insertAt" should "insert an element at the given position in a list" in {
+    assertResult(insertedIntList)(insertAt(2, 5, intList))
+  }
+  it should "insert an element at the beginning of a list" in {
+    assertResult(List(5, 1, 2, 3, 4))(insertAt(0, 5, intList))
+  }
+  it should "insert an element at the end of a list" in {
+    assertResult(List(1, 2, 3, 4, 5))(insertAt(intList.size, 5, intList))
+  }
+  it should "not insert an element in a list when k is an invalid index" in {
+    assertResult(intList)(insertAt(15, 1, intList))
+  }
+  it should "insert an element in an empty list" in {
+    assertResult(List(1))(insertAt(0, 1, Nil))
+  }
+
+  /** listRange */
+  "listRange" should "create a range of numbers" in {
+    assertResult(intList)(listRange(1, 4))
+  }
+  it should "use a custom step if provided" in {
+    assertResult(List(1, 3))(listRange(1, 4, 2))
+  }
+  it should "generate the numbers based on the order of the bounds" in {
+    assertResult(reverseList(intList))(listRange(4, 1, -1))
+    assertResult(List(4, 2))(listRange(4, 1, -2))
+  }
+  it should "generate a single-element range if the bounds are equal" in {
+    assertResult(List(1))(listRange(1, 1))
+    assertResult(List(1))(listRange(1, 1, 5))
+  }
+  it should "return a list with the first bound if the second bound is unreachable" in {
+    assertResult(List(4))(listRange(4, 1, 2))
+    assertResult(List(1))(listRange(1, 4, -2))
   }
 }
 
@@ -225,6 +277,7 @@ class DuplicatesSpec extends UnitSpec {
     assertResult(Nil)(duplicateElementsOnce(Nil))
   }
 
+  /** duplicateElements */
   val duplicatedTwiceList = List(1,1,1,2,2,2,3,3,3,4,4,4)
   "duplicateElements" should "duplicate the elements of a list a certain number of times" in {
     assertResult(duplicatedTwiceList)(duplicateElements(3, intList))
@@ -269,5 +322,23 @@ class RunLengthEncodingSpec extends UnitSpec {
   }
   it should "return on an empty list" in {
     assertResult(Nil)(directEncodeRunLength(Nil))
+  }
+}
+
+class ListRandomSpec extends UnitSpec {
+  import ListRandom.{seededRng, *} // get RNG too
+  import util.Using
+
+  val intList = List(1,2,3,4)
+  val randIntList = List(2,1,4,3)
+  /** extractRandomFromList */
+  "extractRandomFromList" should "extract n random elements from a list" in {
+    assertResult(randIntList)(extractRandomFromList(4, intList))
+  }
+  it should "not fail when n is higher than the size of the list" in {
+    extractRandomFromList(15, randIntList)
+  }
+  it should "return on an empty list" in {
+    assertResult(Nil)(extractRandomFromList(1, Nil))
   }
 }
