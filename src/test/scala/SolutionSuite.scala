@@ -261,7 +261,6 @@ class DuplicatesSpec extends UnitSpec {
     List(List("a", "a", "a", "a"), List("b"), List("c", "c"), 
     List("a", "a"), List("d"), List("e", "e", "e", "e"))
   "packConsecutiveDuplicates" should "return a packed list" in {
-    println(packConsecutiveDuplicates(dupesStrList))
     assertResult(packedStrList)(packConsecutiveDuplicates(dupesStrList))
   }
   it should "return from an empty list" in {
@@ -340,5 +339,19 @@ class ListRandomSpec extends UnitSpec {
   }
   it should "return on an empty list" in {
     assertResult(Nil)(extractRandomFromList(1, Nil))
+  }
+
+  /** drawNumbers */
+  "drawNumbers" should "draw n different random numbers in the range 1 to m" in {
+    val nums = drawNumbers(99, 99) // get all numbers in range to maximize chance of finding duplicates
+    assert(nums.toSet.size == nums.size && nums.size == 99)
+  }
+  it should "not fail when n is greater than m" in {
+    val nums = drawNumbers(50, 10)
+    assert(nums.toSet.size == nums.size && nums.size == 10)
+  }
+  it should "draw numbers when m is less than 1" in {
+    val nums = drawNumbers(5, -3)
+    assert(nums.toSet.size == nums.size && nums.size == 5)
   }
 }

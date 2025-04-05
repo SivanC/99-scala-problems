@@ -265,3 +265,8 @@ object ListRandom:
           case Some(rem) => erfl(c + 1, remained, rem :: acc)
           case None => acc // shouldn't happen because list is non-Nil
     erfl(0, list, Nil)
+
+  /** Problem 24: Draws [n] different random numbers from a pool 1 to [m] */
+  def drawNumbers(n: Int, m: Int)(using r: Random): List[Int] = 
+    val range = if m >= 1 then listRange(1, m) else listRange(1, m, -1)
+    splitByLength(n, r.shuffle(range))._1

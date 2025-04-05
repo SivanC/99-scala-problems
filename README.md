@@ -93,6 +93,11 @@ wrote in Problem 20 provided. The testing was the hardest part of this, and I
 will probably go back and change my method later. This does seem like a good
 place for context parameters and using clauses, though.
 
+Problem 24(\*): Very smooth and satisfying to use three separate custom methods
+plus the context parameter to solve this in one readable line. My first
+iteration of the tests were a little lenient, and making them more strict helped
+me catch/remember that my range function was inclusive.
+
 ## Bonus: Testing Library
 At first, I used MUnit for my testing, as that was the library that was
 suggested on the scala docs website, and it seemed fairly
