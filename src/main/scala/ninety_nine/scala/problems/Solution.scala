@@ -269,4 +269,8 @@ object ListRandom:
   /** Problem 24: Draws [n] different random numbers from a pool 1 to [m] */
   def drawNumbers(n: Int, m: Int)(using r: Random): List[Int] = 
     val range = if m >= 1 then listRange(1, m) else listRange(1, m, -1)
-    splitByLength(n, r.shuffle(range))._1
+    extractRandomFromList(range.size, range)
+
+  /** Problem 25: Generates a random permutation of a [list] */
+  def listPermutation[T](list: List[T])(using Random): List[T] =
+    extractRandomFromList(list.size, list)

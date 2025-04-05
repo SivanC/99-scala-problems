@@ -344,14 +344,26 @@ class ListRandomSpec extends UnitSpec {
   /** drawNumbers */
   "drawNumbers" should "draw n different random numbers in the range 1 to m" in {
     val nums = drawNumbers(99, 99) // get all numbers in range to maximize chance of finding duplicates
-    assert(nums.toSet.size == nums.size && nums.size == 99)
+    assert(nums.toSet.size == nums.size)
+    assert(nums.size == 99)
   }
   it should "not fail when n is greater than m" in {
     val nums = drawNumbers(50, 10)
-    assert(nums.toSet.size == nums.size && nums.size == 10)
+    assert(nums.toSet.size == nums.size)
+    assert(nums.size == 10)
   }
   it should "draw numbers when m is less than 1" in {
     val nums = drawNumbers(5, -3)
-    assert(nums.toSet.size == nums.size && nums.size == 5)
+    assert(nums.toSet.size == nums.size)
+    assert(nums.size == 5)
+  }
+
+  /** listPermutation */
+  "listPermutation" should "generate a random permutation of a list" in {
+    val perm = listPermutation(intList)
+    assert(perm.toSet == intList.toSet)
+  }
+  it should "return on an empty list" in {
+    assertResult(Nil)(listPermutation(Nil))
   }
 }

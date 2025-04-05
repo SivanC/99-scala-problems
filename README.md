@@ -98,6 +98,14 @@ plus the context parameter to solve this in one readable line. My first
 iteration of the tests were a little lenient, and making them more strict helped
 me catch/remember that my range function was inclusive.
 
+Problem 25(\*): Kind of weird for this problem to come after 24, which is a
+specific instance of this problem. I realized I wasn't implementing my own
+shuffle algorithm in 24, so I went back and used 23 as the basis for it and 25.
+I also learned how the counter-intuitive (to me, since it doesn't rely on
+different random numbers) [Fisher-Yates/Knuth shuffle
+method](https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle) works,
+although it wasn't necessary to implement it.
+
 ## Bonus: Testing Library
 At first, I used MUnit for my testing, as that was the library that was
 suggested on the scala docs website, and it seemed fairly
