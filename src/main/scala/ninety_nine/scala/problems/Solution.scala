@@ -75,6 +75,48 @@ object ListOps:
       }
     reverseList(fl(list))
 
+  /** Problem 16: Drops every [n]th element in a list */
+  def dropNthElement[T](n: Int, list: List[T]): List[T] = 
+    if n <= 0 then return list // doesn't make sense for non-positive integers
+    @tailrec
+    def dne(c: Int, list: List[T], acc: List[T]): List[T] = list match
+      case Nil => acc
+      case head :: tail if c % n == 0 => dne(c + 1, tail, acc) 
+      case head :: tail => dne(c + 1, tail, head :: acc)
+    reverseList(dne(1, list, Nil))
+
+  /** Problem 17: Splits a list into two parts by length */
+  def splitByLength[T](len: Int, list: List[T]): (List[T], List[T]) = 
+    if len <= 0 then return (list, Nil)
+    @tailrec
+    def sbl(c: Int, list: List[T], acc: List[T]): (List[T], List[T]) = list match
+      case Nil => (reverseList(acc), Nil) // either len > list.size or list == Nil
+      case head :: tail if c < len => sbl(c + 1, tail, head :: acc) // take
+      case head :: tail => (reverseList(acc), head :: tail)
+    sbl(0, list, Nil)
+
+  /** Problem 18: Extracts a slice from a list */
+  def getSlice[T](i: Int, j: Int, list: List[T]): List[T] =
+    // if i == j then return Nil
+    val (lower, higher) = if i < j then (i, j) else (j, i) // agnostic splice order
+    @tailrec
+    def gs(c: Int, list: List[T], acc: List[T]): List[T] = list match
+      case Nil => acc
+      case head :: tail if c >= lower && c < higher => gs(c + 1, tail, head :: acc)
+      case l if c >= higher => acc // end early
+      case head :: tail => gs(c + 1, tail, acc)
+    reverseList(gs(0, list, Nil))
+
+  /** Problem 19: Rotates a list [n] places to the left */
+  def rotateLeft[T](n: Int, list: List[T]): List[T] =
+    // if n == list.size then return list
+    if n >= 0 then
+      val (first, last) = splitByLength(n, list)
+      last ++: first
+    else
+      val (first, last) = splitByLength(list.size + n, list) // add because n is negative
+      last ++: first
+
 /** Solutions related to duplicate elements in lists */
 object Duplicates:
   import ListOps.*
@@ -98,6 +140,29 @@ object Duplicates:
         pcd(tail, head :: smallAcc, acc)
       case head :: tail => pcd(tail, head :: Nil, smallAcc :: acc) // new run
     reverseList(pcd(list, Nil, Nil))
+
+  /** Problem 14: Duplicates each element in a list in order */
+  def duplicateElementsOnce[T](list: List[T]): List[T] =
+    @tailrec
+    def deo(list: List[T], acc: List[T]): List[T] = list match
+      case Nil => acc
+      case head :: tail => deo(tail, head :: head :: acc)
+    reverseList(deo(list, Nil))
+
+  /** Problem 15: Duplicate the elements of a list such that the list contains
+   *  each original element [times] times, in original order. If
+   *  [times] is 1 or less, return the original list. */
+  def duplicateElements[T](times: Int, list: List[T]): List[T] =
+    if times < 2 then return list
+    @tailrec
+    def de(list: List[T], acc: List[T]): List[T] = list match
+      case Nil => acc
+      case head :: tail => 
+        de(tail, (for i <- 1 to times yield head).toList ++: acc)
+        // Alternative to the guard immediately below function declaration
+        // de(times, tail, head :: (for i <- 1 until times yield head).toList ++: acc)
+    reverseList(de(list, Nil))
+
 
 object RunLengthEncoding:
   import ListOps.*
@@ -147,3 +212,4 @@ object RunLengthEncoding:
       case head :: tail => 
         derl(tail, (1, head), run :: acc) // new non-first run
     reverseList(derl(list, (0, list.head), Nil)) // use head of list as filler value since it has to be of type T
+

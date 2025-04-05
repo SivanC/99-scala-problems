@@ -119,11 +119,81 @@ class ListOpsSpec extends UnitSpec {
   it should "return from an empty list" in {
     assertResult(Nil)(flattenList(Nil))
   }
+
+  /** dropNthElement */
+  val everySecondDropped = List(1,3)
+  "dropNthElement" should "drop every nth element of a list" in {
+    assertResult(everySecondDropped)(dropNthElement(2, intList))
+  }
+  it should "return the original list if n > list size" in {
+    assertResult(intList)(dropNthElement(100, intList))
+  }
+  it should "return the original list if n is non-positive" in {
+    assertResult(intList)(dropNthElement(0, intList))
+    assertResult(intList)(dropNthElement(-1, intList))
+  }
+  it should "return an empty list if n is 1" in {
+    assertResult(Nil)(dropNthElement(1, intList))
+  }
+  it should "return on an empty list" in {
+    assertResult(Nil)(dropNthElement(1, Nil))
+  }
+
+  /** splitByLength */
+  val splitList = (List(1,2), List(3,4))
+  val intListAndNil = (intList, Nil)
+  "splitByLength" should "split a list into two parts, with the first of length len" in {
+    assertResult(splitList)(splitByLength(2, intList))
+  }
+  it should "return the original list with Nil if len is >= length or non-positive" in {
+    assertResult(intListAndNil)(splitByLength(100, intList))
+    assertResult(intListAndNil)(splitByLength(0, intList))
+    assertResult(intListAndNil)(splitByLength(-1, intList))
+  }
+  it should "return a pair of empty lists if the list is empty" in {
+    assertResult((Nil, Nil))(splitByLength(1, Nil))
+  }
+
+  /** getSlice */
+  val intSlice = List(2,3)
+  "getSlice" should "return a specified slice of a list" in {
+    assertResult(intSlice)(getSlice(1, 3, intList))
+    assertResult(intSlice)(getSlice(3, 1, intList))
+  }
+  it should "return the original list when the slice parameters span the whole list" in {
+    assertResult(intList)(getSlice(0, intList.size, intList))
+  }
+  it should "return Nil when slice parameters are equal, too large, or too small" in {
+    assertResult(Nil)(getSlice(1, 1, intList))
+    assertResult(Nil)(getSlice(-2, -1, intList))
+    assertResult(Nil)(getSlice(8, 9, intList))
+  }
+  it should "return on an empty list" in {
+    assertResult(Nil)(getSlice(3, 4, Nil))
+    assertResult(Nil)(getSlice(0, 1, Nil))
+  }
+
+  /** rotateLeft */
+  val rotatedIntList = List(3, 4, 1, 2)
+  "rotateLeft" should "rotate a list left by n indices" in {
+    assertResult(rotatedIntList)(rotateLeft(2, intList))
+  }
+  it should "rotate a list right if n is negative" in {
+    assertResult(rotatedIntList)(rotateLeft(-2, intList))
+  }
+  it should "return the original list if n is 0 or list size" in {
+    assertResult(intList)(rotateLeft(4, intList))
+    assertResult(intList)(rotateLeft(0, intList))
+  }
+  it should "return on an empty list" in {
+    assertResult(Nil)(rotateLeft(1, Nil))
+  }
 }
 
 class DuplicatesSpec extends UnitSpec {  
   import Duplicates.*
   // useful vals
+  val intList = List(1,2,3,4)
   val dupesStrList = List("a", "a", "a", "a", "b", "c", "c", "a", "a", "d", "e", "e", "e", "e")
   /** removeConsecutiveDuplicates */
   val dedupedStrList = List("a", "b", "c", "a", "d", "e")
@@ -144,6 +214,23 @@ class DuplicatesSpec extends UnitSpec {
   }
   it should "return from an empty list" in {
     assertResult(Nil)(packConsecutiveDuplicates(Nil))
+  }
+
+  /** duplicateElementsOnce */
+  val duplicatedOnceList = List(1,1,2,2,3,3,4,4)
+  "duplicateElementsOnce" should "duplicate each element of a list once, in place" in {
+    assertResult(duplicatedOnceList)(duplicateElementsOnce(intList))
+  }
+  it should "return on an empty list" in {
+    assertResult(Nil)(duplicateElementsOnce(Nil))
+  }
+
+  val duplicatedTwiceList = List(1,1,1,2,2,2,3,3,3,4,4,4)
+  "duplicateElements" should "duplicate the elements of a list a certain number of times" in {
+    assertResult(duplicatedTwiceList)(duplicateElements(3, intList))
+  }
+  it should "return the original list if times is less than 2" in {
+    assertResult(intList)(duplicateElements(-1, intList))
   }
 }
 

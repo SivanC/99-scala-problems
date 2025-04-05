@@ -44,6 +44,27 @@ lot of time mapping out the different recursion conditions. To my surprise, I
 was able to write it with only 1 variable tracking both the length and character
 of the run, and also make the function tail recursive.
 
+Problems 14/15(\*, \*\*): Not sure why 15 is two stars, both easily handled with
+the usual tail recursion strategy so far.
+
+Problem 16(\*\*): Surprisingly interesting problem, had to think about how to
+track the index of each element (accumulator), the proper way to handle the
+first element (make its index one), and desired behavior when n is less than 1
+or greater than the list size.
+
+Problem 17(\*): Challenging for a one-star problem. Have to decide what to do
+when the length is non-positive.
+
+Problem 18(\*\*): Required a lot of thought to be put into edge cases and
+expected behavior. I decided to make the slice work no matter the order of the
+first two parameters, as that felt a little more flexible and robust, although
+it might lead to incorrect assumptions that one value is greater than another to
+the unaware.
+
+Problem 19(\*\*): Finally a non-tail recursion problem (well, indirectly it
+was). Glad to be able to use a previous method for an easy solution. I like that
+they had me implement negative numbers as well.
+
 ## Bonus: Testing Library
 At first, I used MUnit for my testing, as that was the library that was
 suggested on the scala docs website, and it seemed fairly
