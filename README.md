@@ -106,6 +106,17 @@ different random numbers) [Fisher-Yates/Knuth shuffle
 method](https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle) works,
 although it wasn't necessary to implement it.
 
+Problem 26(\*\*): This is definitely a different class of problem than the ones
+that have come before. I was initially stuck on this problem without any ideas.
+I learned that it's possible to generate a powerset recursively, and then looked
+at an algorithm to get the number of combinations, which was enough to push me
+to create my own implementation of an algorithm to generate all combinations of
+a certain length. I am left disappointed that the method I chose cannot be put
+in tail-recursive form, since it requires concatenation of two recursive calls.
+However, generating distinct combinations without large memory usage seems quite
+difficult. I have also decided my files got big enough to warrant splitting into
+different modules.
+
 ## Bonus: Testing Library
 At first, I used MUnit for my testing, as that was the library that was
 suggested on the scala docs website, and it seemed fairly

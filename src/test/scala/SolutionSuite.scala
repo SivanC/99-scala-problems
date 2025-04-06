@@ -39,3 +39,6 @@ object TestValues:
   
   /** ListRandom */
   val randIntList = List(2,1,4,3)
+
+  /** Combinatorics */
+  val combinations = List(List(2, 1), List(3, 1), List(3, 2))
