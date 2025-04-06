@@ -274,3 +274,6 @@ object ListRandom:
   /** Problem 25: Generates a random permutation of a [list] */
   def listPermutation[T](list: List[T])(using Random): List[T] =
     extractRandomFromList(list.size, list)
+
+object Combinatorics
+  /** Problem 26 */
